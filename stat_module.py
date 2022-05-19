@@ -64,7 +64,8 @@ import vis_module        as vsp
 import insitu_data       as isd
 import stat_functions    as stf                                                
 
-
+import seaborn as sns
+import matplotlib.dates as mdates
 
 #------------------------------------------------------------------------------
 # Main programm
@@ -81,7 +82,7 @@ import stat_functions    as stf
 #                                                9
 #                                               10 
 
-mode = 6                                                                        
+mode = 1                                                                        
 
 
 
@@ -123,7 +124,8 @@ while True:
 # Setting paths for COSMO, EURONET, FLUXNET, GLEAM, HYRAS, E-OBS data
 #------------------------------------------------------------------------------
 mf_com    = 'C:/Users/Churiulin/Desktop/COSMO_RESULTS/'                        # Main path for project  
-data_exit = mf_com + '/ANALYSIS/PLOTS/' + domain + '/'                         # Main path for project results
+data_exit    = mf_com + '/ANALYSIS/PLOTS/' + domain + '/'                         # Main path for project results
+exit_boxplot = mf_com + '/ANALYSIS/PLOTS/BOXPLOTS/'
 
 sf_cclm_ref  = mf_com + 'COSMO/' + domain + '/CTR/'                            # Path for CCLM_ref  data                
 sf_cclm_v35  = mf_com + 'COSMO/' + domain + '/v3.5/'                           # Path for CCLMv3.5  data                
@@ -144,7 +146,7 @@ sf_eobs      = mf_com + 'REANALYSIS/EOBS/'                                     #
 # Names of parameters for COSMO data
 clm_name = ['AEVAP_S', 'ALHFL_S' , 'ASHFL_S', 'RSTOM'   ,
             'ZVERBO' , 'T_2M'    , 'T_S'    , 'TMAX_2M' ,
-            'TMIN_2M', 'ZTRALEAV']
+            'TMIN_2M', 'ZTRALEAV', 'W_SO'   , 'TOT_PREC']
 
 #r'$H_{2}$'
 
@@ -162,8 +164,8 @@ elif mode == 4:
 else:
     name_2   = ['AEVAP_S, kg m \u207b\u00B2'  , 'ALHFL_S, W m \u207b\u00B2'       , 'ASHFL_S, W m \u207b\u00B2'     , 
                 'RSTOM, s m \u207b\u00B9'     , 'ZVERBO, mm day \u207b\u00B9'    , 'T_2M, C' + u"\N{DEGREE SIGN}"   , 
-                'T_S, C' + u"\N{DEGREE SIGN}", 'TMAX_2M, C' + u"\N{DEGREE SIGN}", 'TMIN_2M, C'  + u"\N{DEGREE SIGN}",
-                'ZTRALEAV, mm day \u207b\u00B9']
+                'T_S, C' + u"\N{DEGREE SIGN}" , 'TMAX_2M, C' + u"\N{DEGREE SIGN}", 'TMIN_2M, C'  + u"\N{DEGREE SIGN}",
+                'ZTRALEAV, mm day \u207b\u00B9', 'W-SO', 'TOT_PREC, mm']
     
 # Name of COSMO data
 fn_cosmo = '_ts_mean_1999_2015.csv'
@@ -241,33 +243,33 @@ sf_field_stat = mf_com + sf_statistic + domain + '/'                           #
 
 # Define the scales limits: y_min - lower limit, y_max - upper limit, y_step - step
 if mode == 1:
-    #            AEVAP,  ALHFL_S,  ASHFL_S,     RSTOM,  ZVERBO,   T2m ,    TS ,   TMAX,    TMIN,  ZTRALEAV
-    y_min  = [   0.0 ,      0.0,    -50.0,       0.0,     0.0 ,    0.0,    0.0,    0.0,     0.0,    0.0 ]
-    y_max  = [   4.01,    110.1,     75.1,   20000.1,     4.01,   25.1,   25.1,   25.1,    25.1,    3.01]
-    y_step = [   0.5 ,     10.0,     25.0,    2000.0,     0.5 ,    5.0,    5.0,    5.0,     5.0,    0.5 ]  
+    #            AEVAP,  ALHFL_S,  ASHFL_S,     RSTOM,  ZVERBO,   T2m ,    TS ,   TMAX,    TMIN,  ZTRALEAV    W_SO    TOT_PREC
+    y_min  = [   0.0 ,      0.0,    -50.0,       0.0,     0.0 ,    0.0,    0.0,    0.0,     0.0,    0.0 ,      0.0,   0.0 ]
+    y_max  = [   4.01,    110.1,     75.1,   20000.1,     4.01,   25.1,   25.1,   25.1,    25.1,    3.01,      0.1,   5.0 ]
+    y_step = [   0.5 ,     10.0,     25.0,    2000.0,     0.5 ,    5.0,    5.0,    5.0,     5.0,    0.5 ,      0.02,  0.5]  
 
 elif mode == 2:
     #            AEVAP,  ALHFL_S,  ASHFL_S,     RSTOM,   ZVERBO,   T2m ,    TS ,   TMAX,    TMIN,  ZTRALEAV
-    y_min  = [   0.0,      0.0,    -50.0,       0.0,     0.0 ,    5.0,    5.0,    5.0,     5.0,     0.0 ]
-    y_max  = [  4.01,    150.1,     75.1,   10000.1,     6.1 ,   30.1,   30.1,   30.1,    30.1,     4.01]
-    y_step = [   0.5,     10.0,     25.0,    1000.0,     1.0 ,    5.0,    5.0,    5.0,     5.0,     0.5 ]  
+    y_min  = [   0.0,      0.0,    -50.0,       0.0,     0.0 ,    5.0,    5.0,    5.0,     5.0,     0.0 ,      0.0,   0.0  ]
+    y_max  = [  4.01,    150.1,     75.1,   10000.1,     6.1 ,   30.1,   30.1,   30.1,    30.1,     4.01,      0.11,  5.01 ]
+    y_step = [   0.5,     10.0,     25.0,    1000.0,     1.0 ,    5.0,    5.0,    5.0,     5.0,     0.5 ,      0.02,  0.5  ] 
 
 elif mode == 3:
     #            AEVAP,  ALHFL_S,  ASHFL_S,     RSTOM,   ZVERBO,   T2m ,    TS ,   TMAX,    TMIN,  ZTRALEAV
-    y_min  = [   0.0,      0.0,    -50.0,       0.0,     0.0 ,   10.0,   10.0,    0.0,     0.0,     0.0]
-    y_max  = [  0.51,    250.1,    200.1,   10000.1,     8.1 ,   30.1,   30.1,   25.1,    25.1,     6.0]
-    y_step = [   0.1,     25.0,     25.0,    1000.0,     1.0 ,    2.0,    2.0,    5.0,     5.0,     1.0]  
+    y_min  = [   0.0,      0.0,    -50.0,       0.0,     0.0 ,   10.0,   10.0,    0.0,     0.0,     0.0,      0.0,   0.0  ]
+    y_max  = [  0.51,    250.1,    200.1,   10000.1,     8.1 ,   30.1,   30.1,   25.1,    25.1,     6.0,      0.11,  5.01 ]
+    y_step = [   0.1,     25.0,     25.0,    1000.0,     1.0 ,    2.0,    2.0,    5.0,     5.0,     1.0,      0.02,  0.5  ]
 
-elif mode == 10:
+elif mode == 9:
     #            AEVAP,  ALHFL_S,  ASHFL_S,     RSTOM,   ZVERBO,   T2m ,    TS ,   TMAX,    TMIN,  ZTRALEAV
-    y_min  = [   0.0,      0.0,    -50.0,       0.0,     0.5 ,   10.0,   10.0,     10.0,     0.0,     0.0]
-    y_max  = [  5.01,    150.1,    150.1,    4000.1,    7.51 ,   30.1,   30.1,     35.1,    25.1,     5.1] #2250
-    y_step = [   0.5,     25.0,     25.0,     500.0,     1.0 ,    2.0,    2.0,      5.0,     5.0,     0.5] #250 
+    y_min  = [   0.0,      0.0,    -50.0,       0.0,     1.0 ,   10.0,   10.0,     10.0,     0.0,     0.0,      0.0,    0.0  ]
+    y_max  = [  5.01,    150.1,    150.1,    2000.1,    5.51 ,   30.1,   30.1,     35.1,    25.1,     5.1,      0.11,  15.5 ] #2250
+    y_step = [   0.5,     25.0,     25.0,     250.0,     0.5 ,    2.0,    2.0,      5.0,     5.0,     0.5,      0.02,   5.0  ] #250 
 else:
     #            AEVAP,  ALHFL_S,  ASHFL_S,     RSTOM,   ZVERBO,   T2m ,    TS ,   TMAX,    TMIN,  ZTRALEAV
-    y_min  = [   0.0,      0.0,   -100.0,       0.0,     0.0 ,   10.0,   10.0,   10.0,    10.0,     0.0]
-    y_max  = [  0.51,    325.1,    350.1,   10000.1,    15.1 ,   40.1,   40.1,   40.1,    40.1,     9.1]
-    y_step = [   0.1,     25.0,     50.0,    1000.0,     1.0 ,    5.0,    5.0,    5.0,     5.0,     1.0]  
+    y_min  = [   0.0,      0.0,   -100.0,       0.0,     0.0 ,   10.0,   10.0,   10.0,    10.0,     0.0,      0.0,   0.0  ]
+    y_max  = [  0.51,    325.1,    350.1,   10000.1,    15.1 ,   40.1,   40.1,   40.1,    40.1,     9.1,      0.11,  5.01 ] 
+    y_step = [   0.1,     25.0,     50.0,    1000.0,     1.0 ,    5.0,    5.0,    5.0,     5.0,     1.0,      0.02,  0.5  ]  
 
 #------------------------------------------------------------------------------
 # Get initial data
@@ -309,8 +311,9 @@ if mode == 1:
  
     # Create time period
     time_start = pd.to_datetime(['2013-01-01'   ])
-    time_stop  = pd.to_datetime(['2013-12-31 23'])
-    
+    time_stop  = pd.to_datetime(['2015-12-31 23'])
+    #time_start = pd.to_datetime(['2013-01-01'   ])
+    #time_stop  = pd.to_datetime(['2013-12-31 23'])    
     t_start   = 6                                                              # parameter --> from  
     t_stop    = 18                                                             # parameter --> to  
     
@@ -520,8 +523,8 @@ elif mode == 4:
     # Get verification plots
     #--------------------------------------------------------------------------
     
-    t_1h = pd.to_datetime(['2011-07-05'])
-    t_2h = pd.to_datetime(['2011-07-15']) 
+    t_1h = pd.to_datetime(['2014-07-05'])
+    t_2h = pd.to_datetime(['2014-07-15']) 
     
     list_data = [] 
     for  tr in range(len(t_1h)):       
@@ -562,76 +565,10 @@ elif mode == 4:
                                y_step[i]  , input_region        )
 
 #------------------------------------------------------------------------------
-# Heat wave
-#------------------------------------------------------------------------------
-elif mode == 5:
-    #--------------------------------------------------------------------------
-    # Get heat waves 
-    #--------------------------------------------------------------------------
-    def extreme_data(data):
-        t2m_mean = data.mean()
-        t2m_std  = data.std()
-        
-        # Create a nan timeseries
-        ts_data    = pd.Series(np.nan, index = data.index)
-        hot_point  = pd.Series(np.nan, index = data.index)
-        cold_point = pd.Series(np.nan, index = data.index)    
-    
-        for i in range(len(data)):
-            ts_data[i] = (data[i] - t2m_mean) / t2m_std 
-        
-        return ts_data, hot_point, cold_point
-
-
-    cosmo_mode = True
-    time_step  = '1M'
-    cosmo_old  = mf_com + 'COSMO/OLD_data/PARC/CTR/' 
-    
-    # Create time period
-    time_start = pd.to_datetime(['2010-01-01'   ])
-    time_stop  = pd.to_datetime(['2015-12-31 23'])
-    
-    for index in range(len(time_start)):
-        hourly_period = pd.date_range(time_start[index], 
-                                       time_stop[index], freq = 'H')           # hourly timesteps 
-        daily_period  = pd.date_range(time_start[index], 
-                                       time_stop[index], freq = 'D')           # dayly timesteps   
-     
-        if cosmo_mode == True:
-            df_old        = csm_data.cosmo_data(cosmo_old, fn_cosmo, clm_name) # Get COSMO_ref  data
-            df_cosmo_data = csm_data.get_timeseries(df_old, clm_name,
-                                                    hourly_period, time_step)        
-            # Get COSMO data
-            extrem, super_hot, super_col = extreme_data(df_cosmo_data['T_2M'])
-            
-        else:     
-            df_hyras_data = df_hyras.resample(time_step).mean()
-            # Get Hyras data
-            extrem, super_hot, super_col = extreme_data(df_hyras_data['T_2M'])         
-                 
-        for i in range(len(extrem)): 
-            if extrem[i] > 1.5:
-                super_hot[i] = extrem[i]           
-            elif extrem[i] < -1.5:
-                super_col[i] = extrem[i]         
-            else:
-                super_hot[i] = np.nan 
-                super_col[i] = np.nan 
-        
-        
-        time_int_1 = str(time_start[index])[0:4]                                  # The date of period start --> need only for print
-        time_int_2 =  str(time_stop[index])[0:4]
-        name_plot  = f'from {time_int_1} to {time_int_2}'
-        
-        verf_plot = vsp.plot_waves(extrem, super_hot, super_col, name_plot, domain,
-                                   station_plot, time_start[index], time_stop[index], 
-                                   data_exit, cosmo_mode)    
-    
-#------------------------------------------------------------------------------
 # Statistic analysis
 #------------------------------------------------------------------------------                           
 elif mode == 6:
-
+    """
     # Create time period
     t_1_m = pd.to_datetime(['2010-01-01'])
     t_2_m = pd.to_datetime(['2015-12-31'])
@@ -745,7 +682,7 @@ elif mode == 6:
     
     df_stat_cosmo = pd.concat([df_cosmo_stat_v35, df_cosmo_stat_v45, df_cosmo_stat_v45e], axis = 0)
     df_stat_cosmo.to_excel(data_exit + 'COSMO_stat.xlsx', float_format='%.3f')
-    
+    """
 #------------------------------------------------------------------------------
 # Section: Statistic analysis (field data)
 #------------------------------------------------------------------------------    
@@ -757,12 +694,19 @@ elif mode == 7:
         #----------------------------------------------------------------------
         # Section 1: Run KGE and RMSD statistic analysis
         #----------------------------------------------------------------------     
-        kge_res, rmsd_res, cor_res =  stf.KGE_RMSD_analysis(sf_field_stat, fn_region, 
+        #kge_res, rmsd_res, cor_res =  stf.KGE_RMSD_analysis(sf_field_stat, fn_region, 
+        #                                                    param, refer,
+        #                                                    ds_name, vrs_GLEAM)
+        
+        kge_res =  stf.KGE_RMSD_analysis(sf_field_stat, fn_region, 
                                                             param, refer,
                                                             ds_name, vrs_GLEAM)
         #----------------------------------------------------------------------
+        
         # Section 2: Run DAV statistic analysis
         #----------------------------------------------------------------------
+        
+        """
         dav_res = stf.DAV_analysis(sf_field_stat, fn_region, param, refer, ds_name, vrs_GLEAM)    
         #----------------------------------------------------------------------
         # Section 3: Import results to excel
@@ -783,7 +727,7 @@ elif mode == 7:
  
     df_statistic.to_excel(path_exit + 'Statistic_' + ds_name + '_' + domain + '.xlsx',  float_format='%.3f')
         #df_stat.to_excel(path_exit + 'Statistic_' + par_list[i] + '_' + ds_name + '.xlsx',  float_format='%.3f')
-
+        """
 #------------------------------------------------------------------------------
 # Plot Taylor diagram based on Yannick Copin example
 #------------------------------------------------------------------------------
@@ -873,7 +817,22 @@ elif mode == 8:
     plt.savefig(path_exit + 'taylor_diagram' + '.png', format='png', dpi = 300) 
     #plt.show()
     
-    
+
+
+
+
+
+
+        
+        
+        
+        
+       # ADD IN_SITU DATA 
+        
+        
+
+
+
 
 elif mode == 9:                                                                # Get avarage daily values (climatic)
     # Create time period
@@ -907,7 +866,7 @@ elif mode == 9:                                                                #
         periods_days.append(daily_period)
         periods_cosmo.append(res_period)    
     
-    time_step     = 'D' 
+    time_step     = '5D' 
 
     # Get COSMO data for full dayvalues
     cclm_ref  = csm_data.data4month(df_cclm_ref , clm_name, periods_hour, time_step) 
@@ -1001,18 +960,111 @@ elif mode == 9:                                                                #
     plt.savefig(data_exit + 'test/' + f'July_{time_step}mean.png', format = 'png', dpi = 300)
     plt.close(fig)        
     plt.gcf().clear()
+
+
+
+
+    fig2 = plt.figure(figsize = (14,10))
+        
+    #Задание координатной сетки и места где будут располагаться графики
+    egrid = (3,4)
+    bx1 = plt.subplot2grid(egrid, (0,0), colspan = 4)
+    bx2 = plt.subplot2grid(egrid, (1,0), colspan = 4)
+    bx3 = plt.subplot2grid(egrid, (2,0), colspan = 4)
+    #ax4 = plt.subplot2grid(egrid, (3,0), colspan = 4)
+
+    if active_time == True:
+        rstom = vsp.get_data_m(bx1, cclm_ref_rstom[clm_name[3]],  cclm_v35_rstom[clm_name[3]],
+                                    cclm_v45_rstom[clm_name[3]], cclm_v45e_rstom[clm_name[3]], 
+                                    et_v35a, et_v35b, t2m,
+                                    clm_name[3],name_2[3], input_region, y_min[3],
+                                    y_max[3]  , y_step[3], time_step, 
+                                    text_values, settings = False, legendary = False)
+    else:
+        rstom = vsp.get_data_m(bx1, cclm_ref[clm_name[3]],  cclm_v35[clm_name[3]],
+                                    cclm_v45[clm_name[3]], cclm_v45e[clm_name[3]], 
+                                    et_v35a, et_v35b, t2m,
+                                    clm_name[3],name_2[3], input_region, y_min[3],
+                                    y_max[3]  , y_step[3], time_step, 
+                                    text_values, settings = False, legendary = False)
+        
+    w_so = vsp.get_data_m(bx2, cclm_ref_rstom[clm_name[-2]],  cclm_v35_rstom[clm_name[-2]],
+                               cclm_v45_rstom[clm_name[-2]], cclm_v45e_rstom[clm_name[-2]], 
+                               ep_v35a, ep_v35b, t2m,
+                               clm_name[-2],name_2[-2], input_region, y_min[-2],
+                               y_max[-2]  , y_step[-2], time_step, 
+                               text_values, settings = False )
     
-    """
+    tot_prec = vsp.get_data_m(bx3, cclm_ref[clm_name[-1]],  cclm_v35[clm_name[-1]],
+                                   cclm_v45[clm_name[-1]], cclm_v45e[clm_name[-1]],
+                                   ep_v35a, ep_v35b, t2m,
+                                   clm_name[-1], name_2[-1], input_region, y_min[-1],
+                                   y_max[-1]   , y_step[-1], time_step,
+                                   text_values, legendary = False)
+    
+
+        
+
+    
+    plt.savefig(data_exit + 'test/' + f'July2_{time_step}mean.png', format = 'png', dpi = 300)
+    plt.close(fig2)        
+    plt.gcf().clear()
+    
+"""
     for i in range(len(clm_name)):
         plot = vsp.get_data_m(cclm_ref   , cclm_v35 , cclm_v45, cclm_v45e, df_obs,
                               clm_name[i], name_2[i], input_region, y_min[i], y_max[i] , y_step[i]  ,
                               text_values, data_exit ) 
-    """    
+"""    
                               
 
-
-
+"""
+elif mode == 10:                                                                # Get avarage daily values (climatic)
+    # Create time period
+    time_start = pd.to_datetime(['2010-07-01'   , '2011-07-01'   , '2012-07-01 '  , 
+                                 '2013-07-01'   , '2014-07-01'   , '2015-07-01'   ])
+    
+    time_stop  = pd.to_datetime(['2010-07-31 23', '2011-07-31 23', '2012-07-31 23', 
+                                 '2013-07-31 23', '2014-07-31 23', '2015-07-31 23'])  
+    
+    t_start = 6                                                              # parameter --> from  
+    t_stop  = 18                                                             # parameter --> to  
+    active_time = True
+    #--------------------------------------------------------------------------
+    # Create time periods 
+    #--------------------------------------------------------------------------
+    periods_hour = []
+    periods_days = [] 
+    periods_cosmo = []
+    
+    for time_index in range(len(time_start)):
+        hourly_period = pd.date_range(time_start[time_index],
+                                      time_stop[time_index], freq = 'H')       # hourly timesteps
         
+        daily_period  = pd.date_range(time_start[time_index],
+                                      time_stop[time_index], freq = 'D')       # dayly timesteps 
+        
+        # General time period for COSMO, FLUXNET and EURONET data
+        res_period    = [x for x in hourly_period if x.hour >= t_start and x.hour <= t_stop]
+             
+        periods_hour.append(hourly_period)
+        periods_days.append(daily_period)
+        periods_cosmo.append(res_period)    
+    
+    time_step     = '31D' 
+
+    # Get COSMO data for full dayvalues
+    cclm_ref  = csm_data.data4month(df_cclm_ref , clm_name, periods_hour, time_step) 
+    cclm_v35  = csm_data.data4month(df_cclm_v35 , clm_name, periods_hour, time_step) 
+    cclm_v45  = csm_data.data4month(df_cclm_v45 , clm_name, periods_hour, time_step) 
+    cclm_v45e = csm_data.data4month(df_cclm_v45e, clm_name, periods_hour, time_step) 
+
+    # Get COSMO RSTOM data only from 6:00 to 18:00
+    cclm_ref_rstom  = csm_data.data4month(df_cclm_ref , clm_name, periods_cosmo, time_step) 
+    cclm_v35_rstom  = csm_data.data4month(df_cclm_v35 , clm_name, periods_cosmo, time_step) 
+    cclm_v45_rstom  = csm_data.data4month(df_cclm_v45 , clm_name, periods_cosmo, time_step) 
+    cclm_v45e_rstom = csm_data.data4month(df_cclm_v45e, clm_name, periods_cosmo, time_step)
+"""        
 
     
 
