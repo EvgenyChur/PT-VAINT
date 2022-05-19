@@ -127,11 +127,11 @@ def KGE_RMSD_analysis(path_main, fn_region, par_list, refer, ds_name, vrs_GLEAM)
     
     if refer == 'HYRAS':
         # FileNames for data - HYRAS
-        m_obs  = refer   + '_' + par_list + '_mean_' + fn_region + '_domain.csv'
-        s_obs  = refer   + '_' + par_list + '_std_'  + fn_region + '_domain.csv'
-        m_mod  = ds_name + '_' + par_list + '_mean_' + fn_region + '_domain.csv'
-        s_mod  = ds_name + '_' + par_list + '_std_'  + fn_region + '_domain.csv'   
-        c_name = 'Corr_' + refer + '_' + ds_name + '_' + par_list + '_' + fn_region + '_domain.csv'
+        m_obs  = f'{refer}_{par_list}_mean_{fn_region}_domain.csv'
+        s_obs  = f'{refer}_{par_list}_std_{fn_region}_domain.csv'
+        m_mod  = f'{ds_name}_{par_list}_mean_{fn_region}_domain.csv'
+        s_mod  = f'{ds_name}_{par_list}_std_{fn_region}_domain.csv'   
+        c_name = f'Corr_{refer}_{ds_name}_{par_list}_{fn_region}_domain.csv'
     else:
         # FileNames for data - GLEAM
         m_obs  = refer   + '_' + vrs_GLEAM + '_' + par_list  + '_mean_' + fn_region + '_domain.csv'
@@ -161,6 +161,8 @@ def KGE_RMSD_analysis(path_main, fn_region, par_list, refer, ds_name, vrs_GLEAM)
     df_data = pd.concat([lon, lat, df_mean_obs, df_std_obs, df_mean_mod, 
                                     df_std_mod, df_corr  ], axis = 1)
     
+    return df_data
+    """
     # Delete nan values
     df_data = df_data.dropna()
     # Reset index
@@ -219,7 +221,7 @@ def KGE_RMSD_analysis(path_main, fn_region, par_list, refer, ds_name, vrs_GLEAM)
     ref_rmsd = np.mean(rmsd)
     
     return ref_kge, ref_rmsd, ref_corr  
-
+    """
 
 
     """ Old version
