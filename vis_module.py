@@ -102,16 +102,31 @@ yearFmt = mdates.DateFormatter('%Y')
 #                    leg5, leg6, leg7        - name of parameters for legend
 #------------------------------------------------------------------------------
 
+def plots1(ax, par1, leg1): 
+    ax.plot(par1.index, par1, label = leg1, color = 'blue' , linestyle = '-' )
+
 def plots2(ax, par1, par2, leg1, leg2): 
     ax.plot(par1.index, par1, label = leg1, color = 'blue' , linestyle = '-' )
     ax.plot(par2.index, par2, label = leg2, color = 'green', linestyle = '-' ) 
+
+def plots2_tot_prec(ax, par1, par2, leg1, leg2):    
+    ax.bar(par1.index, par1, label = leg1, color = 'blue' , linestyle = '-' )
+    ax.bar(par2.index, par2, label = leg2, color = 'green', linestyle = '-' )
 
 def plots3(ax, par1, par2, par3, 
                leg1, leg2, leg3): 
     ax.plot(par1.index, par1, label = leg1, color = 'blue' , linestyle = '-' )
     ax.plot(par2.index, par2, label = leg2, color = 'green', linestyle = '-' )
     ax.plot(par3.index, par3, label = leg3, color = 'brown', linestyle = '-' ) 
- 
+
+# Plot lines for MODIS data
+def plots3_modis(ax, par1, par2, par3, col, 
+               leg1, leg2, leg3): 
+    ax.plot(par1.index, par1[col], label = leg1, color = 'blue' , linestyle = '-' )
+    ax.plot(par2.index, par2[col], label = leg2, color = 'green', linestyle = '-' )
+    ax.plot(par3.index, par3[col], label = leg3, color = 'brown', linestyle = '-' ) 
+    
+    
 def plots4(ax, par1, par2, par3, par4,
                leg1, leg2, leg3, leg4):    
     ax.plot(par1.index, par1, label = leg1, color = 'blue' , linestyle = '-' )
@@ -119,6 +134,12 @@ def plots4(ax, par1, par2, par3, par4,
     ax.plot(par3.index, par3, label = leg3, color = 'brown', linestyle = '-' ) 
     ax.plot(par4.index, par4, label = leg4, color = 'red'  , linestyle = '-' )
 
+def plots4_tot_prec(ax, par1, par2, par3, par4,
+                        leg1, leg2, leg3, leg4):    
+    ax.bar(par1.index, par1, label = leg1, color = 'blue' , linestyle = '-' )
+    ax.bar(par2.index, par2, label = leg2, color = 'green', linestyle = '-' )
+    ax.bar(par3.index, par3, label = leg3, color = 'brown', linestyle = '-' ) 
+    ax.bar(par4.index, par4, label = leg4, color = 'red'  , linestyle = '-' )
 
 def plots5(ax, par1, par2, par3, par4, par5, 
                leg1, leg2, leg3, leg4, leg5):
@@ -135,7 +156,9 @@ def plots5_stomata(ax, par1, par2, par3, par4, par5,
     ax.plot(par2.index,    par2, label = leg2, color = 'green', linestyle = '-' ) #, linewidth = 2)
     ax.plot(par3.index,    par3, label = leg3, color = 'brown', linestyle = '-' ) #, alpha = 0.4 , linewidth = 2) 
     ax.plot(par4.index,    par4, label = leg4, color = 'red'  , linestyle = '-' ) # , alpha = 0.6 , linewidth = 2)    
-    ax.scatter(par5.index, par5, label = leg5, color = 'black', linewidths = 3.5)    
+    ax.errorbar(par5.index, par5, yerr=10, fmt='o', label = leg5, color = 'black',
+                ecolor = 'gray')
+    #ax.scatter(par5.index, par5, label = leg5, color = 'black', linewidths = 3.5)    
 
 def plots6(ax, par1, par2, par3, par4, par5, par6,
                leg1, leg2, leg3, leg4, leg5, leg6):
@@ -341,6 +364,133 @@ def lplots_stomata(ax, y_label, nst, leg_pos,
 
 
 
+
+
+
+
+#------------------------------------------------------------------------------
+# The line plots settings -only for stomatal resistance data
+#------------------------------------------------------------------------------
+# The function with settings for line plots:
+# 
+# Input parameters:  ax                   - work area
+#                    plot_title           - plot    label
+#                    y_label              - y axis  label
+#                    period               - period  label
+#                    station              - station label
+#                    leg_pos              - legend position
+#                    y_min, y_max, y_step - limits for y axis
+#                    p_start, p_stop      - limits for x axis
+#------------------------------------------------------------------------------  
+def lplots_stomata2(ax, y_label, leg_pos,
+                        y_min, y_max,  y_step, llegend = True): 
+      
+   
+    ax.set_ylabel(y_label, color = 'black', fontsize = 16, labelpad = 20)
+    
+    font = font_manager.FontProperties(family = 'Arial', style  = 'normal', size = 16)    
+    if llegend == True:    
+        ax.legend(prop = font, loc = leg_pos)
+    else:
+        print('lplots_stomata2 no legend')
+    
+    ax.get_yticks()
+    ax.set_yticks(np.arange(y_min, y_max, y_step))
+    ax.get_xticks()
+    ax.tick_params(axis = 'y' , which ='major', bottom = True  , top = False,
+                   left = True, right = True  , labelleft ='on', labelright = 'on')
+    ax.tick_params(axis = 'y' , which ='minor', bottom = True  , top = False,
+                   left = True, right = True  , labelleft ='on', labelright = 'on')
+    # Gap betweet axis
+    for tick in ax.get_xaxis().get_major_ticks():
+        tick.set_pad(12.)
+        tick.label1 = tick._get_text1()
+        
+    xax = ax.xaxis
+    yax = ax.yaxis
+    #ax.set_xticks(pd.date_range(time_step_1, time_step_2, freq = '1M'))
+    #ax.set_xlim(p_start, p_stop)
+    xftm = mdates.DateFormatter('%d-%m')   #'%B')  #) #%m-%d  '%B'
+    ax.xaxis.set_major_formatter(xftm)
+    ax.xaxis.set_minor_locator(days)
+    for label in ax.xaxis.get_ticklabels():
+        label.set_color('black')
+        label.set_rotation(0)
+        label.set_fontsize(16)
+    for label in ax.yaxis.get_ticklabels():
+        label.set_color('black')
+        label.set_fontsize(16)
+    yax.set_minor_locator(minorLocator_4)
+    yax.set_minor_formatter(NullFormatter())
+    xax.grid(True, which = 'minor', color = 'grey', linestyle = 'dashed', alpha = 0.2)
+    yax.grid(True, which = 'minor', color = 'grey', linestyle = 'dashed', alpha = 0.2) 
+    ax.grid(True , which = 'major', color = 'k'   , linestyle = 'solid' , alpha = 0.5)
+
+
+
+#------------------------------------------------------------------------------
+# The line plots settings for MODIS data
+#------------------------------------------------------------------------------
+# The function with settings for line plots:
+# 
+# Input parameters:  ax                   - work area
+#                    plot_title           - plot    label
+#                    y_label              - y axis  label
+#                    station              - station label
+#                    leg_pos              - legend position
+#                    y_min, y_max, y_step - limits for y axis
+#                    p_start, p_stop      - limits for x axis
+#------------------------------------------------------------------------------   
+def modis_plots(ax, plot_title, y_label, y_min, y_max, y_step):   
+    
+    # Labels settings
+    ax.set_title(plot_title, color = 'black', fontsize = 14, pad = 20) 
+    ax.set_ylabel(y_label  , color = 'black', fontsize = 14, labelpad = 20)
+
+    # Legend settings
+    ax.legend(loc = 'upper right', frameon = True)  
+   
+    # Get y ticks parameters
+    ax.set_yticks(np.arange(y_min, y_max, y_step))
+    ax.tick_params(axis = 'y' , which ='major', bottom = True  , top = False,
+                   left = True, right = True  , labelleft ='on', labelright = 'on')
+    ax.tick_params(axis = 'y' , which ='minor', bottom = True  , top = False,
+                   left = True, right = True  , labelleft ='on', labelright = 'on')    
+    
+    # Gap betweet axis
+    for tick in ax.get_xaxis().get_major_ticks():
+        tick.set_pad(12.)
+        tick.label1 = tick._get_text1()
+    
+    # Additional parameters for axis    
+    xax = ax.xaxis
+    yax = ax.yaxis
+
+    xftm = mdates.DateFormatter('%Y-%m-%d')
+    ax.xaxis.set_major_formatter(xftm)
+    ax.xaxis.set_minor_locator(days)
+    for label in ax.xaxis.get_ticklabels():
+        label.set_color('black')
+        label.set_rotation(15)
+        label.set_fontsize(12)
+    for label in ax.yaxis.get_ticklabels():
+        label.set_color('black')
+        label.set_fontsize(14)
+    yax.set_minor_locator(minorLocator_1)
+    yax.set_minor_formatter(NullFormatter())
+    xax.grid(True, which = 'minor', color = 'grey', linestyle = 'dashed', 
+                                                             alpha = 0.2)
+    yax.grid(True, which = 'minor', color = 'grey', linestyle = 'dashed',  
+                                                             alpha = 0.2) 
+    ax.grid(True , which = 'major', color = 'k'   , linestyle = 'solid' ,
+                                                             alpha = 0.5)
+
+
+
+
+
+
+
 # Statistical sections
 
 #------------------------------------------------------------------------------
@@ -370,30 +520,49 @@ def get_m(df, df2, df3, df4, df5, param, name_2, data_out, y1, y2, step, status)
     fig = plt.figure(figsize = (14,10))
     ax  = fig.add_subplot(111)
 
-    plt.plot(df.index ,  df[param], label = 'CCLMref'  , color = 'blue'  , linestyle = '-' )
-    plt.plot(df2.index, df2[param], label = 'CCLMv3.5' , color = 'green' , linestyle = '-' ) #, linewidth = 2)
-    plt.plot(df3.index, df3[param], label = 'CCLMv4.5' , color = 'brown' , linestyle = '-' ) #, alpha = 0.4 , linewidth = 2)
-    plt.plot(df4.index, df4[param], label = 'CCLMv4.5e', color = 'red'   , linestyle = '-' ) #, alpha = 0.6 , linewidth = 2)    
+    if param == 'TOT_PREC':
+        plot4 = plots4_tot_prec(ax,  df[param], df2[param] , 
+                                    df3[param], df4[param] ,
+                                    'CCLMref' , 'CCLMv3.5' ,
+                                    'CCLMv4.5', 'CCLMv4.5e')
+    else:
+        plot4 = plots4(ax,  df[param], df2[param] , 
+                           df3[param], df4[param] ,
+                           'CCLMref' , 'CCLMv3.5' ,
+                           'CCLMv4.5', 'CCLMv4.5e')
     
+    # Define the observational data (ep - 2013)
     if param == 'ALHFL_S':
-        plt.plot(df5.index, df5['LE'], label = 'OBS', color = 'black', linestyle = ':')
-    elif param == 'ASHFL_S': 
-        plt.plot(df5.index, df5['H'] , label = 'OBS', color = 'black', linestyle = ':')            
+        obs_data = 'LE'
+    elif param == 'ASHFL_S':         
+        obs_data = 'H'        
+    elif param == 'T_2M':
+        obs_data = 'T_2M'
+    elif param == 'T_S':
+        obs_data = 'TS'
+    elif param == 'TMAX_2M':
+        obs_data = 'TMAX'
+    elif param == 'TMIN_2M':        
+        obs_data = 'TMIN'        
     elif param == 'AEVAP_S':
-        plt.plot(df5.index, df5['Et_a'], label = 'Gleam_v3.5a', color = 'black', linestyle = ':'  )                
-        plt.plot(df5.index, df5['Et_b'], label = 'Gleam_v3.5b', color = 'black', linestyle = '--' )                  
-    elif param == 'ZVERBO':
-        plt.plot(df5.index, df5['Ep_a'], label = 'Gleam_v3.5a', color = 'black', linestyle = ':'  )                
-        plt.plot(df5.index, df5['Ep_b'], label = 'Gleam_v3.5b', color = 'black', linestyle = '--' )                   
-    elif param == 'T_2M': 
-        plt.plot(df5.index, df5['T_2M'], label = 'obs', color = 'black', linestyle = ':')
-    elif param == 'T_S': 
-        plt.plot(df5.index, df5['TS']  , label = 'obs', color = 'black', linestyle = ':')
-    elif param == 'TMAX_2M': 
-        plt.plot(df5.index, df5['TMAX'], label = 'obs', color = 'black', linestyle = ':')
-    elif param == 'TMIN_2M': 
-        plt.plot(df5.index, df5['TMIN'], label = 'obs', color = 'black', linestyle = ':')    
+        gl_v35a = 'Et_a'
+        gl_v35b = 'Et_b'
+    elif param == 'ZVERBO': 
+        gl_v35a = 'Ep_a'
+        gl_v35b = 'Ep_b'       
         
+    # Add new data to the plot     
+    if param in ('ALHFL_S', 'ASHFL_S', 'T_2M', 'T_S', 
+                 'TMAX_2M', 'TMIN_2M'):
+        plt.plot(df5.index, df5[obs_data], label = 'OBS', color = 'black', linestyle = ':')
+    elif param in ('AEVAP_S', 'ZVERBO'):
+        plt.plot(df5.index, df5[gl_v35a], label = 'Gleam_v3.5a', color = 'black', linestyle = ':'  )                
+        plt.plot(df5.index, df5[gl_v35b], label = 'Gleam_v3.5b', color = 'black', linestyle = '--' )         
+    else:
+        print(f'There no in-situ data for {param}')        
+
+    
+    
     font = font_manager.FontProperties(family = 'Arial', style  = 'normal', size = 16)    
         
     ax.legend(prop = font, loc = 'upper right')
@@ -430,6 +599,108 @@ def get_m(df, df2, df3, df4, df5, param, name_2, data_out, y1, y2, step, status)
     plt.close(fig)        
     plt.gcf().clear() 
 #------------------------------------------------------------------------------    
+
+
+#------------------------------------------------------------------------------
+# Subroutine: get_2m
+#------------------------------------------------------------------------------
+# The subroutine needs for getting actual plot for parameters (Average montly values)
+# 
+# Input parameters : df       - dataset with COSMO data (COSMO_CTR)
+#                    df2      - dataset with COSMO data (COSMO_v3.5)  
+#                    df3      - dataset with COSMO data (COSMO_v4.5)
+#                    df4      - dataset with COSMO data (COSMO_v4.5e)
+#                    df5      - dataset with in-situ, reanalysis, satellite data
+#                    param    - parameter from COSMO
+#                    name_2   - label for Y-axis
+#                    data_out - path for output
+#                    y1       - min values for y-axis
+#                    y2       - max values for Y-axis
+#                    step     - step between y1 and y2
+#                    status   - the domain territory    
+#
+# Output parameters: Plot with parameters
+#------------------------------------------------------------------------------
+
+def get_2m(df, df2, df5, param, name_2, data_out, y1, y2, step, status):
+    #print (status)
+    
+    fig = plt.figure(figsize = (14,10))
+    ax  = fig.add_subplot(111)
+
+    if param == 'TOT_PREC':
+        plot2 = plots2_tot_prec(ax, df[param], df2[param], 
+                                    'CCLMref', 'CCLMv4.5')
+    else:
+        plot2 = plots2(ax,  df[param], df2[param], 
+                           'CCLMref' , 'CCLMv4.5')
+      
+    # Define the observational data (ep - 2013)
+    if param == 'ALHFL_S':
+        obs_data = 'LE'
+    elif param == 'ASHFL_S':         
+        obs_data = 'H'        
+    elif param == 'T_2M':
+        obs_data = 'T_2M'
+    elif param == 'T_S':
+        obs_data = 'TS'
+    elif param == 'TMAX_2M':
+        obs_data = 'TMAX'
+    elif param == 'TMIN_2M':        
+        obs_data = 'TMIN'        
+    elif param == 'AEVAP_S':
+        gl_v35a = 'Et_a'
+        gl_v35b = 'Et_b'
+    elif param == 'ZVERBO': 
+        gl_v35a = 'Ep_a'
+        gl_v35b = 'Ep_b'       
+        
+    # Add new data to the plot     
+    if param in ('ALHFL_S', 'ASHFL_S', 'T_2M', 'T_S', 
+                 'TMAX_2M', 'TMIN_2M'):
+        plt.plot(df5.index, df5[obs_data], label = 'OBS', color = 'black', linestyle = ':')
+    elif param in ('AEVAP_S', 'ZVERBO'):
+        plt.plot(df5.index, df5[gl_v35a], label = 'Gleam_v3.5a', color = 'black', linestyle = ':'  )                
+        plt.plot(df5.index, df5[gl_v35b], label = 'Gleam_v3.5b', color = 'black', linestyle = '--' )         
+    else:
+        print(f'There no in-situ data for {param}')        
+
+    
+    
+    font = font_manager.FontProperties(family = 'Arial', style  = 'normal', size = 16)          
+    ax.legend(prop = font, loc = 'upper right')  
+    if status == '1':
+        ax.set_title('Domain: Parc' + '     ' + 'Station: Rollesbroich',
+                     color = 'black', fontsize = 18, pad = 20)    
+    ax.set_ylabel(name_2, color = 'black', fontsize = 16, labelpad = 20)
+    ax.get_yticks()
+    ax.set_yticks(np.arange(y1, y2, step))
+    for label in ax.xaxis.get_ticklabels():
+        label.set_color('black')
+        label.set_rotation(30)
+        label.set_fontsize(16)
+    for label in ax.yaxis.get_ticklabels():
+        label.set_color('black')
+        label.set_fontsize(18)   
+    plt.grid()
+    plt.savefig(data_out + param + '_annual.png', format = 'png', dpi = 300)
+    plt.close(fig)        
+    plt.gcf().clear() 
+#------------------------------------------------------------------------------ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   
 #------------------------------------------------------------------------------
