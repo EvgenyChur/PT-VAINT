@@ -17,21 +17,11 @@ E. Churiulin<sup>1</sup>, V. Kopeikin<sup>2</sup>, M. Übel<sup>3</sup>, J. Helm
 </p>
 
 ## The repository contains:
-1. The new module with stomatal resistance and leaf photosyntesis for CCLM<sub>v3.5</sub>
+1. New module with stomatal resistance and leaf photosyntesis for CCLM<sub>v3.5</sub>
     * [src_phenology.f90][phen]
-2. The module with constant PFT parameters and other constants for CCLM<sub>v3.5</sub>
+2. Module with constant PFT parameters and other constants for CCLM<sub>v3.5</sub>
     * [src_data_phenology.f90][data]
-3. The postprocessing scipts for work with COSMO-CLM results:
-    * [main.sh][main_ini] - postprocessing of COSMO-CLM parameters for verification and analysis 
-    * [bonus.sh][bonus] - postprocessing of COSMO-CLM parameters for additional tests, future developments
-4. The preprocessing scripts for HYRAS, E-OBS, GLEAM datasets:
-    * [EOBS_domain][E_dom] - interpolation of E-OBS data to COSMO-CLM grid
-    * [HYRAS_domain][H_dom] - interpolation of HYRAS data to COSMO-CLM grid
-    * [GLEAM_domain][GL_dom] - interpolation of GLEAM data to COSMO-CLM grid
-    * [EOBS_python][E_py] - preprocessing E-OBS data for CESR_project.py and stat_module.py
-    * [HYRAS_python][H_py] - preprocessing HYRAS data for CESR_project.py and stat_module.py
-    * [GLEAM_python][GL_pyt] - preprocessing GLEAM data for CESR_project.py and stat_module.py
-5. The new ***Python*** project, with statistical and visualization modules:
+3. New ***Python*** project, with statistical and visualization modules:
     * [CESR_project.py][cesr] and [stat_module][main] - the main programms for verification, statistical analysis and visualization of COSMO-CLM results:  
         + [cosmo_data.py][cosmo] - personal module for downloading and preparing COSMO data
         + [fluxnet_data.py][flux] - personal module for downloading and preparing FLUXNET and EURONET data
