@@ -1,24 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Autors of project: Evgenii Churiulin, Merja Tölle, Center for Enviromental 
-                                                   System Research (CESR) 
+Created on Fri May  7 16:50:07 2021
 
-The Etopo background was downloaded from https://www.ngdc.noaa.gov/mgg/global/global.html
-Cite ETOPO1: doi:10.7289/V5C8276M
-
-
-Current Code Owner: CESR, Evgenii Churiulin
-phone:  +49  561 804-6142
-fax:    +49  561 804-6116
-email:  evgenychur@uni-kassel.de
-History:
-Version    Date       Name
----------- ---------- ----                                                   
-    1.1    2021-06-18 Evgenii Churiulin, Center for Enviromental System Research (CESR)
-           Initial release
-           
-           
-           
+@author: churiulin
 """
 
 import harmonica as hm
