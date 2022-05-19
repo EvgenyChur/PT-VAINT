@@ -134,7 +134,8 @@ def get_timeseries(df_cosmo, clm_name, period, ts):
                     df_cosmo[param][j] = 20000.0    
             # calculate mean values                                      
             new_data = df_cosmo[param][period].resample(ts).mean()         
-
+        elif param == 'TOT_PREC':
+            new_data = df_cosmo[param][period].resample(ts).sum() 
         else:
             new_data = df_cosmo[param][period].resample(ts).mean()            
         
@@ -172,7 +173,7 @@ def cosmo_montly_data(data, clm_name, period, ts):
     df     = get_timeseries(data, clm_name, period, ts)             
     df     = df.reset_index()
     mon_id = df['index'].dt.month                                              # get the current number for each row based on timeindex
-    #mon_id  = df_parc['Date'].dt.month
+    #mon_id  = df['Date'].dt.month
     df_montly = df.groupby(mon_id).mean()
     # Re-indexing
     time_index = pd.date_range('1/1/2019', '12/1/2019', freq='MS').strftime('%B')
